@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f7f8">
+  <title>입체도형 탐구</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="geometry.js"></script>
+  <script defer src="nets.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <header class="masthead">
+    <div class="shell masthead-inner">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3 20 7.5v9L12 21l-8-4.5v-9L12 3Z M4 7.5l8 4.5 8-4.5 M12 12v9"/></svg></span>
+        수학 교구
+      </div>
+      <button id="fullscreen" class="text-button" type="button"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 4H4v5m11-5h5v5m0 6v5h-5M4 15v5h5"/></svg><span>전체 화면</span></button>
+    </div>
+  </header>
+
+  <main class="shell">
+    <div class="intro">
+      <h1>입체도형 탐구</h1>
+      <p>도형을 돌려 보고, 펼친 면을 하나씩 접어 보세요.</p>
+    </div>
+
+    <div class="controls">
+      <nav class="modes" aria-label="활동 선택">
+        <button id="show-observe" type="button" class="mode" aria-controls="observe" aria-pressed="true">겨냥도</button>
+        <button id="show-net" type="button" class="mode" aria-controls="net" aria-pressed="false">전개도</button>
+      </nav>
+      <div class="filters">
+        <label class="select-field"><span>입체도형</span><select id="shape">
+          <option value="cube">정육면체</option><option value="box">직육면체</option><option value="tetra">정사면체</option><option value="octa">정팔면체</option><option value="dodeca">정십이면체</option><option value="icosa">정이십면체</option>
+        </select></label>
+        <label id="net-picker" class="select-field" hidden><span>전개도 유형</span><select id="net-type"></select></label>
+      </div>
+    </div>
+
+    <section id="observe" aria-labelledby="show-observe" class="workspace">
+      <div class="board">
+        <div class="compare">
+          <section class="view view-model">
+            <div class="view-heading"><h2>입체도형</h2></div>
+            <canvas id="solid-view" class="rotatable" tabindex="0" role="img" aria-label="회전할 수 있는 입체도형" aria-describedby="rotate-hint"></canvas>
+          </section>
+          <section class="view view-sketch">
+            <div class="view-heading"><h2>겨냥도</h2></div>
+            <canvas id="sketch-view" class="rotatable" tabindex="0" role="img" aria-label="입체도형과 같은 방향에서 본 겨냥도" aria-describedby="rotate-hint"></canvas>
+          </section>
+        </div>
+        <div class="board-bar">
+          <p id="rotate-hint"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 12h18m-14-4-4 4 4 4m10-8 4 4-4 4M12 3v18m-4-14 4-4 4 4m-8 10 4 4 4-4"/></svg>그림을 드래그해 돌려 보세요.<span class="sr-only"> 방향키로도 돌릴 수 있습니다.</span></p>
+          <button id="reset-view" class="text-button" type="button"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 5v5h5M4 10a8 8 0 1 1 .8 6"/></svg>처음 각도</button>
+        </div>
+      </div>
+      <aside class="details">
+        <div class="detail-block shape-block">
+          <h2 id="shape-name">정육면체</h2>
+          <dl class="measurements">
+            <div><dt>면</dt><dd id="face-count">6</dd></div>
+            <div><dt>모서리</dt><dd id="edge-count">12</dd></div>
+            <div><dt>꼭짓점</dt><dd id="vertex-count">8</dd></div>
+          </dl>
+        </div>
+        <div class="detail-block edge-block">
+          <h2>모서리 표시</h2>
+          <div class="legend"><span class="sample" aria-hidden="true"></span><span>보이는 모서리</span></div>
+          <label class="legend toggle-row"><span class="sample dashed" aria-hidden="true"></span><span>숨은 모서리</span><input id="hidden-edges" type="checkbox" role="switch" checked></label>
+        </div>
+      </aside>
+    </section>
+
+    <section id="net" aria-labelledby="show-net" class="workspace" hidden>
+      <div class="board">
+        <section class="view net-view">
+          <div class="view-heading"><h2>전개도</h2><p id="net-hint">도형을 눌러 펼치고, 드래그해 돌려 보세요.</p></div>
+          <button id="reset-net-view" class="text-button angle-button" type="button" aria-label="처음 각도" title="처음 각도" hidden><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 5v5h5M4 10a8 8 0 1 1 .8 6"/></svg><span>처음 각도</span></button>
+          <span id="net-rotate-help" class="sr-only">방향키로도 돌릴 수 있습니다.</span>
+          <canvas id="fold-view" class="rotatable" tabindex="0" aria-label="면을 차례대로 펼치고 접는 입체도형" aria-describedby="net-hint net-rotate-help" role="img"></canvas>
+        </section>
+        <div class="board-bar fold-bar">
+          <button id="reset-net" class="text-button" type="button"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 5v5h5M4 10a8 8 0 1 1 .8 6"/></svg>처음부터</button>
+          <button id="net-next" class="primary-button" type="button"><span>첫 면 펼치기</span><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></button>
+        </div>
+      </div>
+      <aside class="details net-details">
+        <div class="detail-block">
+          <h2>진행 상태</h2>
+          <p id="fold-status" class="fold-status" role="status"></p>
+          <progress id="fold-progress" aria-label="펼치기 진행" value="0" max="5"></progress>
+        </div>
+        <div id="preview-block" class="detail-block preview-block" hidden>
+          <h2 id="preview-heading">펼친 모양</h2>
+          <canvas id="net-preview" role="img" aria-labelledby="preview-heading"></canvas>
+          <div class="legend"><span class="sample dashed" aria-hidden="true"></span><span>접는 선</span></div>
+        </div>
+      </aside>
+    </section>
+  </main>
+</body>
+</html>
